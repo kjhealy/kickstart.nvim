@@ -23,7 +23,7 @@ vim.opt.termguicolors = true
 vim.o.number = true
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
--- vim.o.relativenumber = true
+vim.o.relativenumber = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.o.mouse = 'a'
@@ -932,6 +932,30 @@ require('lazy').setup({
     },
   },
 })
+
+-- Configure air formatter
+local lsp = vim.lsp
+
+lsp.config['air'] = {
+  on_attach = function(_, bufnr)
+    vim.api.nvim_create_autocmd('BufWritePre', {
+      buffer = bufnr,
+      callback = function()
+        lsp.buf.format()
+      end,
+    })
+  end,
+}
+
+-- Disable formatting from R language server
+lsp.config['r_language_server'] = {
+  on_attach = function(client, _)
+    client.server_capabilities.documentFormattingProvider = false
+    client.server_capabilities.documentRangeFormattingProvider = false
+  end,
+}
+
+lsp.enable 'air'
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
